@@ -16,10 +16,15 @@ import {
   ArrowLeft,
   Share2,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getProductBySlug, getProducts, getCategories } from "@/lib/firebase/firestore-service";
 import { Product, Category } from "@/lib/types";
 import { initialProducts, initialCategories } from "@/lib/initial-data";
+import { Reveal, RevealStagger } from "@/components/motion/Reveal";
+import { SplitText } from "@/components/motion/SplitText";
+import { TiltCard } from "@/components/motion/TiltCard";
+import { Magnetic } from "@/components/motion/Magnetic";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -80,34 +85,8 @@ export default function ProductDetailPage() {
     }
   };
 
-  // Structured Data JSON-LD for Product
-  const productSchema = {
-    "@context": "https://schema.org/",
-    "@type": "Product",
-    name: localize(product.title),
-    image: product.images,
-    description: localize(product.shortDescription),
-    brand: {
-      "@type": "Brand",
-      name: "TERAZ Furniture",
-    },
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "EGP",
-      availability: "https://schema.org/InStock",
-      url: currentUrl,
-      description: "Custom quote upon spatial measurement and material selection",
-    },
-  };
-
   return (
     <>
-      {/* Insert JSON-LD Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
-      />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-2 text-xs text-taupe">
@@ -132,20 +111,31 @@ export default function ProductDetailPage() {
         </nav>
 
         {/* Product Showcase: Gallery & Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 xl:gap-14">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 xl:gap-14 items-start">
           {/* Left Column: Image Gallery (7 cols) */}
           <div className="lg:col-span-7 space-y-4">
-            {/* Primary Main Image */}
+            {/* Primary Main Image with AnimatePresence */}
             <div className="relative aspect-[16/11] rounded-3xl overflow-hidden border border-gold/40 shadow-2xl bg-espresso/5">
-              <Image
-                src={product.images[activeImageIdx] || product.images[0]}
-                alt={localize(product.title)}
-                fill
-                priority
-                className="object-cover"
-              />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeImageIdx}
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="relative w-full h-full"
+                >
+                  <Image
+                    src={product.images[activeImageIdx] || product.images[0]}
+                    alt={localize(product.title)}
+                    fill
+                    priority
+                    className="object-cover"
+                  />
+                </motion.div>
+              </AnimatePresence>
               {/* Badge */}
-              <div className="absolute top-4 start-4 bg-espresso/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-gold/40 text-xs font-bold text-gold-light">
+              <div className="absolute top-4 start-4 bg-espresso/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-gold/40 text-xs font-bold text-gold-light pointer-events-none">
                 {language === "ar" ? "تصنيع بالطلب والتفصيل" : "Bespoke Commission"}
               </div>
             </div>
@@ -170,8 +160,8 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          {/* Right Column: Specs, Highlights & Quote CTAs (5 cols) */}
-          <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
+          {/* Right Column: Sticky Details & Specs (5 cols) */}
+          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
             <div className="space-y-4">
               {/* Category Pill & Share */}
               <div className="flex items-center justify-between">
@@ -185,7 +175,7 @@ export default function ProductDetailPage() {
                 )}
                 <button
                   onClick={handleShare}
-                  className="flex items-center gap-1.5 text-xs text-taupe hover:text-espresso transition-colors"
+                  className="flex items-center gap-1.5 text-xs text-taupe hover:text-espresso transition-colors active:scale-95"
                 >
                   <Share2 className="w-3.5 h-3.5" />
                   <span>{copied ? (language === "ar" ? "تم النسخ!" : "Copied!") : (language === "ar" ? "مشاركة" : "Share")}</span>
@@ -194,165 +184,138 @@ export default function ProductDetailPage() {
 
               {/* Title */}
               <h1 className="text-2xl sm:text-3xl font-extrabold text-espresso leading-snug">
-                {localize(product.title)}
+                <SplitText priority={true} text={localize(product.title)} />
               </h1>
 
               {/* Short Description */}
-              <p className="text-sm text-taupe leading-relaxed">
+              <p className="text-xs sm:text-sm text-taupe leading-relaxed">
                 {localize(product.shortDescription)}
               </p>
+            </div>
 
-              {/* Materials & Colors Finishes */}
-              <div className="space-y-3 pt-2">
-                {product.materials && product.materials.length > 0 && (
-                  <div>
-                    <span className="text-xs font-bold text-espresso block mb-1.5">
-                      {language === "ar" ? "الخامات الرئيسية:" : "Key Materials:"}
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {product.materials.map((m, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1 rounded-lg bg-cream-dark border border-gold/30 text-xs font-medium text-espresso"
-                        >
-                          {localize(m)}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+            {/* Specifications & Features */}
+            <div className="p-6 rounded-2xl bg-cream-dark/50 border border-gold/30 space-y-4">
+              <h3 className="text-xs font-bold text-espresso uppercase tracking-widest">
+                {language === "ar" ? "المواصفات الفنية المعتمدة" : "Technical Specifications"}
+              </h3>
 
-                {product.colorsFinishes && product.colorsFinishes.length > 0 && (
-                  <div>
-                    <span className="text-xs font-bold text-espresso block mb-1.5">
-                      {language === "ar" ? "الألوان والتشطيبات المتاحة:" : "Available Finishes:"}
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {product.colorsFinishes.map((c, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1 rounded-lg bg-cream border border-gold/20 text-xs text-taupe"
-                        >
-                          {localize(c)}
-                        </span>
-                      ))}
+              <div className="space-y-2.5">
+                {product.specs && product.specs.length > 0 ? (
+                  product.specs.map((spec, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-xs text-espresso border-b border-gold/10 pb-2">
+                      <span className="font-semibold text-espresso">{localize(spec.label)}</span>
+                      <span className="text-taupe">{localize(spec.value)}</span>
                     </div>
-                  </div>
+                  ))
+                ) : (
+                  product.materials && product.materials.map((mat, idx) => (
+                    <div key={idx} className="flex items-start gap-2.5 text-xs text-espresso">
+                      <Check className="w-4 h-4 text-gold shrink-0 mt-0.5" />
+                      <span className="leading-relaxed">{localize(mat)}</span>
+                    </div>
+                  ))
                 )}
               </div>
 
-              {/* Trust Badges */}
-              <div className="p-4 rounded-2xl bg-cream-dark/60 border border-gold/20 space-y-2 text-xs text-taupe">
-                <div className="flex items-center gap-2 text-espresso font-semibold">
+              <div className="pt-3 border-t border-gold/20 grid grid-cols-2 gap-3 text-xs text-taupe">
+                <div className="flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-gold" />
-                  <span>{language === "ar" ? "ضمان رسمي معتمد حتى 10 سنوات" : "Certified 10-Year Full Warranty"}</span>
+                  <span>{language === "ar" ? "ضمان 10 سنوات" : "10-Year Warranty"}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <Ruler className="w-4 h-4 text-gold" />
-                  <span>{language === "ar" ? "مقايسة ليزر دقيقة وتصميم 3D قبل التنفيذ" : "Precision laser survey & 3D render included"}</span>
+                  <span>{language === "ar" ? "رفع مقاسات بالليزر" : "Laser Survey Included"}</span>
                 </div>
               </div>
             </div>
 
-            {/* CTAs Box (NO PRICES SHOWN) */}
-            <div className="pt-4 border-t border-gold/20 space-y-3">
-              <Link
-                href={`/quote?service=${category?.slug || ""}&product=${product.slug}`}
-                className="w-full py-4 rounded-full bg-espresso text-cream text-sm font-bold flex items-center justify-center gap-2 hover:bg-black border border-gold/40 shadow-xl transition-all pulse-gold"
-              >
-                <Sparkles className="w-4 h-4 text-gold-light" />
-                <span>{language === "ar" ? "اطلب عرض سعر ومقايسة لهذا التصميم" : "Request a Quote for this Design"}</span>
-              </Link>
-
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-3.5 rounded-full bg-[#25D366] text-white text-xs font-bold flex items-center justify-center gap-2 hover:bg-green-600 shadow-md transition-colors"
-              >
-                <MessageCircle className="w-4 h-4 fill-current" />
-                <span>{language === "ar" ? "استفسر عن هذا التصميم عبر واتساب" : "WhatsApp Inquiry for this Item"}</span>
-              </a>
-
-              <p className="text-center text-[11px] text-taupe">
-                {language === "ar"
-                  ? "الأسعار تُحدد بناءً على أبعاد المكان والخامات المختارة لنمنحك أفضل سعر عادل."
-                  : "Quotes are calculated precisely based on exact spatial dimensions and selected finishes."}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Detailed Full Description & Specs Table */}
-        <div className="pt-10 border-t border-gold/20 grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-6 space-y-4">
-            <h2 className="text-xl font-bold text-espresso">
-              {language === "ar" ? "عن هذا التصميم والتفاصيل الفنية" : "Design Narrative & Engineering Details"}
-            </h2>
-            <div className="hairline-gold w-24" />
-            <p className="text-sm text-taupe leading-relaxed whitespace-pre-line">
-              {localize(product.fullDescription)}
-            </p>
-          </div>
-
-          <div className="lg:col-span-6 space-y-4">
-            <h2 className="text-xl font-bold text-espresso">
-              {language === "ar" ? "جدول المواصفات والضمان" : "Technical Specifications Table"}
-            </h2>
-            <div className="hairline-gold w-24" />
-            <div className="rounded-2xl border border-gold/30 bg-cream-dark/40 overflow-hidden divide-y divide-gold/15">
-              {product.specs &&
-                product.specs.map((spec, idx) => (
-                  <div key={idx} className="p-3.5 flex items-center justify-between text-xs">
-                    <span className="font-bold text-espresso">{localize(spec.label)}</span>
-                    <span className="text-taupe">{localize(spec.value)}</span>
-                  </div>
-                ))}
-              {product.dimensions && (
-                <div className="p-3.5 flex items-center justify-between text-xs">
-                  <span className="font-bold text-espresso">{language === "ar" ? "المقاسات" : "Dimensions"}</span>
-                  <span className="text-taupe">{localize(product.dimensions)}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <div className="pt-12 border-t border-gold/20 space-y-6">
-            <h2 className="text-2xl font-bold text-espresso text-center">
-              {language === "ar" ? "تصاميم أخرى قد تنال إعجابك" : "Related Designs You May Admire"}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedProducts.map((rel) => (
+            {/* Quote Action CTAs */}
+            <div className="space-y-3">
+              <Magnetic strength={0.2}>
                 <Link
-                  key={rel.id}
-                  href={`/products/${rel.slug}`}
-                  className="group rounded-2xl overflow-hidden bg-cream-dark/50 border border-gold/25 hover:border-gold transition-all duration-300 flex flex-col"
+                  href={`/quote?service=${product.categoryId}&product=${product.slug}`}
+                  className="w-full py-4 rounded-full bg-gold text-espresso font-bold text-xs uppercase tracking-wider hover:bg-gold-light transition-all shadow-xl flex items-center justify-center gap-2 pulse-gold active:scale-95"
                 >
-                  <div className="relative aspect-[16/11] overflow-hidden">
-                    <Image
-                      src={rel.images[0]}
-                      alt={localize(rel.title)}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-4 space-y-1">
-                    <h3 className="text-sm font-bold text-espresso group-hover:text-gold transition-colors truncate">
-                      {localize(rel.title)}
-                    </h3>
-                    <p className="text-xs text-taupe line-clamp-1">{localize(rel.shortDescription)}</p>
-                    <span className="text-[11px] font-bold text-gold block pt-1">
-                      {language === "ar" ? "اطلب عرض سعر ←" : "Request Quote →"}
-                    </span>
-                  </div>
+                  <Sparkles className="w-4 h-4 text-espresso" />
+                  <span>{language === "ar" ? "طلب مقايسة وعرض سعر لهذا التصميم" : "Request Survey & Custom Quote"}</span>
                 </Link>
-              ))}
+              </Magnetic>
+
+              <Magnetic strength={0.2}>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3.5 rounded-full bg-[#25D366] text-white font-bold text-xs flex items-center justify-center gap-2 hover:bg-green-600 transition-colors shadow-lg active:scale-95"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>{language === "ar" ? "استفسر فورًا عبر واتساب" : "Inquire via WhatsApp"}</span>
+                </a>
+              </Magnetic>
             </div>
+          </div>
+        </div>
+
+        {/* Related Products Section */}
+        {relatedProducts.length > 0 && (
+          <div className="space-y-8 pt-8 border-t border-gold/20">
+            <div>
+              <span className="text-xs font-bold text-gold uppercase tracking-widest block mb-1">
+                {language === "ar" ? "تصاميم قد تلهمك" : "Related Designs"}
+              </span>
+              <h2 className="text-2xl font-bold text-espresso">
+                {language === "ar" ? "نماذج أخرى من نفس القسم" : "More From This Discipline"}
+              </h2>
+            </div>
+
+            <RevealStagger className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedProducts.map((rel, idx) => (
+                <Reveal key={rel.id} staggerIndex={idx} variant="up" className="h-full">
+                  <TiltCard maxTilt={4} className="h-full">
+                    <Link
+                      href={`/products/${rel.slug}`}
+                      className="group block rounded-2xl overflow-hidden bg-cream-dark/50 border border-gold/25 hover:border-gold transition-all duration-300 h-full"
+                    >
+                      <div className="relative aspect-[16/11] overflow-hidden">
+                        <Image
+                          src={rel.images[0]}
+                          alt={localize(rel.title)}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="p-4 space-y-1">
+                        <h4 className="text-sm font-bold text-espresso group-hover:text-gold transition-colors truncate">
+                          {localize(rel.title)}
+                        </h4>
+                        <p className="text-[11px] text-taupe truncate">{localize(rel.shortDescription)}</p>
+                      </div>
+                    </Link>
+                  </TiltCard>
+                </Reveal>
+              ))}
+            </RevealStagger>
           </div>
         )}
+      </div>
+
+      {/* Mobile Sticky Bottom Action Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-cream/95 backdrop-blur-md border-t border-gold/30 p-3 flex items-center gap-3 shadow-2xl">
+        <Link
+          href={`/quote?service=${product.categoryId}&product=${product.slug}`}
+          className="flex-1 py-3 rounded-full bg-gold text-espresso font-bold text-xs uppercase tracking-wider text-center shadow-md active:scale-95"
+        >
+          {language === "ar" ? "طلب مقايسة" : "Get Quote"}
+        </Link>
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-11 h-11 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-md active:scale-95"
+          aria-label="WhatsApp"
+        >
+          <MessageCircle className="w-5 h-5 fill-current" />
+        </a>
       </div>
     </>
   );

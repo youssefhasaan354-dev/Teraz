@@ -1,0 +1,88 @@
+{
+  "pagesTested": [
+    "/ (desktop)",
+    "/categories (desktop)",
+    "/products (desktop)",
+    "/projects (desktop)",
+    "/configurator (desktop)",
+    "/contact (desktop)",
+    "/ (mobile)",
+    "/categories (mobile)",
+    "/products (mobile)",
+    "/projects (mobile)",
+    "/configurator (mobile)",
+    "/contact (mobile)"
+  ],
+  "consoleErrors": [
+    {
+      "route": "/products",
+      "viewport": "desktop",
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "route": "/",
+      "viewport": "mobile",
+      "errors": [
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+        "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+      ]
+    },
+    {
+      "route": "/products",
+      "viewport": "mobile",
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    }
+  ],
+  "overflowDetected": [],
+  "footerReachable": [
+    "/ (desktop)",
+    "/categories (desktop)",
+    "/products (desktop)",
+    "/projects (desktop)",
+    "/configurator (desktop)",
+    "/contact (desktop)",
+    "/ (mobile)",
+    "/categories (mobile)",
+    "/products (mobile)",
+    "/projects (mobile)",
+    "/configurator (mobile)",
+    "/contact (mobile)"
+  ],
+  "reducedMotionPassed": true,
+  "screenshots": [
+    "D:\\Teraz\\docs\\screenshots\\home-desktop-top.png",
+    "D:\\Teraz\\docs\\screenshots\\home-desktop-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\categories-desktop-top.png",
+    "D:\\Teraz\\docs\\screenshots\\categories-desktop-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\products-desktop-top.png",
+    "D:\\Teraz\\docs\\screenshots\\products-desktop-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\projects-desktop-top.png",
+    "D:\\Teraz\\docs\\screenshots\\projects-desktop-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\configurator-desktop-top.png",
+    "D:\\Teraz\\docs\\screenshots\\configurator-desktop-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\contact-desktop-top.png",
+    "D:\\Teraz\\docs\\screenshots\\contact-desktop-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\home-mobile-top.png",
+    "D:\\Teraz\\docs\\screenshots\\home-mobile-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\categories-mobile-top.png",
+    "D:\\Teraz\\docs\\screenshots\\categories-mobile-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\products-mobile-top.png",
+    "D:\\Teraz\\docs\\screenshots\\products-mobile-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\projects-mobile-top.png",
+    "D:\\Teraz\\docs\\screenshots\\projects-mobile-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\configurator-mobile-top.png",
+    "D:\\Teraz\\docs\\screenshots\\configurator-mobile-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\contact-mobile-top.png",
+    "D:\\Teraz\\docs\\screenshots\\contact-mobile-bottom.png",
+    "D:\\Teraz\\docs\\screenshots\\home-reduced-motion.png"
+  ],
+  "metrics": {
+    "domContentLoaded": 255,
+    "loadTime": 255,
+    "fcp": 252
+  }
+}

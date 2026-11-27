@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
+import { useInView, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface BeforeAfterProps {
@@ -20,7 +21,41 @@ export function BeforeAfter({
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: "-80px" });
+  const shouldReduceMotion = useReducedMotion();
   const { language } = useLanguage();
+  const hasAutoDemoed = useRef(false);
+
+  // Auto-demo sweep when entering viewport
+  useEffect(() => {
+    if (isInView && !hasAutoDemoed.current && !shouldReduceMotion) {
+      hasAutoDemoed.current = true;
+      let start: number | null = null;
+      const demoDuration = 1800; // ms
+
+      const step = (timestamp: number) => {
+        if (!start) start = timestamp;
+        const elapsed = timestamp - start;
+        const progress = Math.min(elapsed / demoDuration, 1);
+
+        // Sinusoidal sweep: 50% -> 25% -> 70% -> 50%
+        const sweep = 50 + Math.sin(progress * Math.PI * 2) * 22;
+        setSliderPosition(sweep);
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          setSliderPosition(50);
+        }
+      };
+
+      const timer = setTimeout(() => {
+        requestAnimationFrame(step);
+      }, 400);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isInView, shouldReduceMotion]);
 
   const handleMove = useCallback(
     (clientX: number) => {
@@ -65,7 +100,7 @@ export function BeforeAfter({
             className="object-cover"
             priority
           />
-          <div className="absolute bottom-4 right-4 bg-espresso/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-gold/40 text-cream text-xs font-medium tracking-wide">
+          <div className="absolute bottom-4 right-4 bg-espresso/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-gold/40 text-cream text-xs font-medium tracking-wide">
             {language === "ar" ? "بعد التنفيذ ✨" : "After ✨"}
           </div>
         </div>
@@ -83,7 +118,7 @@ export function BeforeAfter({
               sizes="(max-width: 1200px) 100vw, 1200px"
               className="object-cover"
             />
-            <div className="absolute bottom-4 left-4 bg-espresso/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-gold/40 text-cream text-xs font-medium tracking-wide">
+            <div className="absolute bottom-4 left-4 bg-espresso/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-gold/40 text-cream text-xs font-medium tracking-wide">
               {language === "ar" ? "قبل التجديد" : "Before"}
             </div>
           </div>
@@ -94,8 +129,8 @@ export function BeforeAfter({
           className="absolute top-0 bottom-0 z-20 pointer-events-none"
           style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
         >
-          <div className="w-0.5 h-full bg-gold shadow-[0_0_10px_rgba(217,185,126,0.8)]" />
-          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 left-1/2 w-10 h-10 rounded-full bg-espresso border-2 border-gold flex items-center justify-center text-gold shadow-2xl pointer-events-auto cursor-ew-resize">
+          <div className="w-0.5 h-full bg-gold shadow-[0_0_12px_rgba(217,185,126,0.9)]" />
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 left-1/2 w-10 h-10 rounded-full bg-espresso border-2 border-gold flex items-center justify-center text-gold shadow-2xl pointer-events-auto cursor-ew-resize hover:scale-110 transition-transform">
             <svg
               className="w-5 h-5"
               fill="none"

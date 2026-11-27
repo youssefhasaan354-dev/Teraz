@@ -17,6 +17,10 @@ import {
   ChevronDown,
   Phone,
   MessageCircle,
+  Award,
+  Layers,
+  ChevronRight,
+  ChevronLeft,
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
@@ -51,6 +55,10 @@ import { Marquee } from "@/components/motion/Marquee";
 import { BeforeAfter } from "@/components/motion/BeforeAfter";
 import { PinnedStory } from "@/components/motion/PinnedStory";
 import { HorizontalScroll } from "@/components/motion/HorizontalScroll";
+import { Parallax } from "@/components/motion/Parallax";
+import { LineDraw } from "@/components/motion/LineDraw";
+import { ScrubTextHighlight } from "@/components/motion/ScrubTextHighlight";
+import { TiltCard } from "@/components/motion/TiltCard";
 import { KitchenConfigurator } from "@/components/public/KitchenConfigurator";
 
 export default function HomePage() {
@@ -62,6 +70,7 @@ export default function HomePage() {
   const [stats, setStats] = useState<StatItem[]>(initialStats);
   const [services, setServices] = useState<ServiceItem[]>(initialServices);
   const [openFaq, setOpenFaq] = useState<string | null>("faq-1");
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   useEffect(() => {
     getCategories().then((res) => { if (res && res.length > 0) setCategories(res); });
@@ -95,20 +104,22 @@ export default function HomePage() {
         ];
 
   return (
-    <div className="space-y-24 sm:space-y-32">
+    <div className="space-y-24 sm:space-y-36">
       {/* ============================================================ */}
       {/* 1. CINEMATIC HERO SECTION                                    */}
       {/* ============================================================ */}
-      <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-espresso text-cream -mt-20 pt-24 pb-16">
-        {/* Background Layer with Dark Gradient & Subtle Image */}
+      <section className="relative min-h-[95vh] flex items-center justify-center overflow-hidden bg-espresso text-cream -mt-20 pt-24 pb-16">
+        {/* Parallax Background Layer */}
         <div className="absolute inset-0 z-0">
-          <Image
-            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2000&q=85"
-            alt="TERAZ Luxury Kitchen"
-            fill
-            priority
-            className="object-cover opacity-25 scale-105"
-          />
+          <Parallax speed={0.25} className="w-full h-[120%] -top-[10%]">
+            <Image
+              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2000&q=85"
+              alt="TERAZ Luxury Kitchen"
+              fill
+              priority
+              className="object-cover opacity-30 scale-105"
+            />
+          </Parallax>
           <div className="absolute inset-0 bg-gradient-to-t from-espresso via-espresso/80 to-espresso/60" />
           <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gold/10 rounded-full blur-[140px] pointer-events-none" />
         </div>
@@ -153,7 +164,7 @@ export default function HomePage() {
               <Magnetic strength={0.25}>
                 <Link
                   href="/quote"
-                  className="px-8 py-4 rounded-full bg-gold text-espresso font-bold text-sm tracking-wide shadow-2xl hover:bg-gold-light transition-all flex items-center gap-2.5 pulse-gold"
+                  className="px-8 py-4 rounded-full bg-gold text-espresso font-bold text-sm tracking-wide shadow-2xl hover:bg-gold-light transition-all flex items-center gap-2.5 pulse-gold active:scale-95"
                 >
                   <Sparkles className="w-4 h-4 text-espresso" />
                   <span>{language === "ar" ? "اطلب استشارة وتصميم مجاني" : "Request Free Consultation & Quote"}</span>
@@ -163,7 +174,7 @@ export default function HomePage() {
               <Magnetic strength={0.25}>
                 <Link
                   href="/projects"
-                  className="px-8 py-4 rounded-full bg-cream/10 text-cream font-semibold text-sm hover:bg-cream/20 border border-gold/40 transition-all flex items-center gap-2 backdrop-blur-sm"
+                  className="px-8 py-4 rounded-full bg-cream/10 text-cream font-semibold text-sm hover:bg-cream/20 border border-gold/40 transition-all flex items-center gap-2 backdrop-blur-sm active:scale-95"
                 >
                   <span>{language === "ar" ? "استكشف أحدث أعمالنا" : "Explore Portfolio"}</span>
                   <span>{language === "ar" ? "←" : "→"}</span>
@@ -189,31 +200,42 @@ export default function HomePage() {
               </span>
             </div>
           </Reveal>
+
+          {/* Pulsing Scroll Cue Indicator */}
+          <div className="pt-4 flex justify-center">
+            <div className="w-6 h-10 rounded-full border-2 border-gold/40 flex items-start justify-center p-1.5">
+              <div className="w-1.5 h-2.5 rounded-full bg-gold animate-bounce" />
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ============================================================ */}
       {/* 2. INFINITE MARQUEE STRIP                                    */}
       {/* ============================================================ */}
-      <Marquee items={marqueeItems} speed={30} />
+      <Marquee items={marqueeItems} speed={32} />
 
       {/* ============================================================ */}
-      {/* 3. BRAND EDITORIAL INTRO & CRAFTSMANSHIP                     */}
+      {/* 3. BRAND EDITORIAL INTRO & CRAFTSMANSHIP (SCRUB HIGHLIGHT)   */}
       {/* ============================================================ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <Reveal variant="up" className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-6 space-y-6">
             <span className="text-xs font-bold text-gold uppercase tracking-widest block">
               {language === "ar" ? "فلسفة طِراز (TERAZ)" : "The TERAZ Philosophy"}
             </span>
 
-            <h2 className="text-3xl sm:text-4xl font-bold text-espresso leading-snug">
-              {language === "ar"
-                ? "الأناقة الهادئة ليست مجرد مظهر، بل هي دقة في كل مليمتر ومفصل."
-                : "Quiet luxury is not an aesthetic; it is engineering precision in every millimeter."}
-            </h2>
+            {/* Scrubbed Text Highlight */}
+            <ScrubTextHighlight
+              text={
+                language === "ar"
+                  ? "الأناقة الهادئة ليست مجرد مظهر خارجي، بل هي دقة هندسية في كل مليمتر ومفصل وخامة طبيعية نختارها بعناية."
+                  : "Quiet luxury is not an outward appearance; it is engineering precision in every millimeter, joint, and hand-selected natural finish."
+              }
+              textClassName="text-2xl sm:text-3xl font-extrabold"
+            />
 
-            <div className="hairline-gold w-32" />
+            <LineDraw variant="horizontal" className="w-32 my-4" />
 
             <p className="text-sm sm:text-base text-taupe leading-relaxed">
               {language === "ar"
@@ -221,9 +243,9 @@ export default function HomePage() {
                 : "At TERAZ, we champion custom architectural living. Operating direct-from-workshop allows us to channel maximum investment into premium hardwoods, Turkish aluminum, and Austrian Blum hardware without inflated retail overheads."}
             </p>
 
-            <div className="grid grid-cols-2 gap-4 pt-2">
+            <RevealStagger className="grid grid-cols-2 gap-4 pt-2">
               <Reveal variant="up" staggerIndex={0}>
-                <div className="p-4 rounded-2xl bg-cream-dark/60 border border-gold/20">
+                <div className="p-4 rounded-2xl bg-cream-dark/60 border border-gold/20 hover:border-gold/50 transition-colors">
                   <span className="text-2xl font-bold text-gold block">100%</span>
                   <span className="text-xs text-espresso font-semibold block mt-1">
                     {language === "ar" ? "مقاومة للمياه والرطوبة" : "Moisture & Water Proof"}
@@ -235,7 +257,7 @@ export default function HomePage() {
               </Reveal>
 
               <Reveal variant="up" staggerIndex={1}>
-                <div className="p-4 rounded-2xl bg-cream-dark/60 border border-gold/20">
+                <div className="p-4 rounded-2xl bg-cream-dark/60 border border-gold/20 hover:border-gold/50 transition-colors">
                   <span className="text-2xl font-bold text-gold block">Blum</span>
                   <span className="text-xs text-espresso font-semibold block mt-1">
                     {language === "ar" ? "مفصلات نمساوية أصلية" : "Austrian Soft-Close"}
@@ -245,18 +267,20 @@ export default function HomePage() {
                   </span>
                 </div>
               </Reveal>
-            </div>
-          </Reveal>
+            </RevealStagger>
+          </div>
 
           <Reveal variant="clip" className="lg:col-span-6 relative aspect-[4/3] rounded-3xl overflow-hidden border border-gold/30 shadow-2xl">
-            <Image
-              src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80"
-              alt="TERAZ Bespoke Interior Craft"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-espresso/70 via-transparent to-transparent" />
-            <div className="absolute bottom-6 right-6 left-6 text-cream text-xs flex justify-between items-center">
+            <Parallax speed={0.15} className="w-full h-[120%] -top-[10%]">
+              <Image
+                src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80"
+                alt="TERAZ Bespoke Interior Craft"
+                fill
+                className="object-cover"
+              />
+            </Parallax>
+            <div className="absolute inset-0 bg-gradient-to-t from-espresso/70 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute bottom-6 right-6 left-6 text-cream text-xs flex justify-between items-center pointer-events-none">
               <span className="font-semibold tracking-wide">
                 {language === "ar" ? "توريد مباشر من الورشة إلى موقعك" : "Direct Turnkey Delivery"}
               </span>
@@ -266,12 +290,22 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Section Divider */}
+      <div className="max-w-4xl mx-auto px-4">
+        <LineDraw variant="arc" className="w-full h-8 opacity-60" />
+      </div>
+
       {/* ============================================================ */}
       {/* 4. PINNED STORYTELLING CATEGORIES                            */}
       {/* ============================================================ */}
       <section className="relative">
         <PinnedStory categories={categories} />
       </section>
+
+      {/* Section Divider */}
+      <div className="max-w-4xl mx-auto px-4">
+        <LineDraw variant="horizontal" className="w-full opacity-40" />
+      </div>
 
       {/* ============================================================ */}
       {/* 5. FEATURED PROJECTS (HORIZONTAL SCROLL)                     */}
@@ -333,7 +367,7 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/* 8. OUR SEAMLESS PROCESS (HOW WE WORK)                        */}
+      {/* 8. OUR SEAMLESS PROCESS (WITH VERTICAL LINE DRAW)             */}
       {/* ============================================================ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-3 mb-12">
@@ -350,7 +384,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <RevealStagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <RevealStagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
           {[
             {
               step: "01",
@@ -413,20 +447,24 @@ export default function HomePage() {
                 key={idx}
                 staggerIndex={idx}
                 variant="up"
-                className="p-6 rounded-2xl bg-cream-dark/50 border border-gold/25 hover:border-gold transition-all duration-300 relative group flex flex-col justify-between"
+                className="h-full"
               >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-serif font-bold text-gold/60 group-hover:text-gold transition-colors">
-                      {item.step}
-                    </span>
-                    <div className="w-10 h-10 rounded-xl bg-gold/15 text-gold flex items-center justify-center">
-                      <Icon className="w-5 h-5" />
+                <TiltCard maxTilt={4} className="h-full">
+                  <div className="p-6 rounded-2xl bg-cream-dark/50 border border-gold/25 hover:border-gold transition-all duration-300 relative group flex flex-col justify-between h-full">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl font-serif font-bold text-gold/60 group-hover:text-gold transition-colors">
+                          {item.step}
+                        </span>
+                        <div className="w-10 h-10 rounded-xl bg-gold/15 text-gold flex items-center justify-center">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                      </div>
+                      <h3 className="text-base font-bold text-espresso">{localize(item.title)}</h3>
+                      <p className="text-xs text-taupe leading-relaxed">{localize(item.desc)}</p>
                     </div>
                   </div>
-                  <h3 className="text-base font-bold text-espresso">{localize(item.title)}</h3>
-                  <p className="text-xs text-taupe leading-relaxed">{localize(item.desc)}</p>
-                </div>
+                </TiltCard>
               </Reveal>
             );
           })}
@@ -436,8 +474,9 @@ export default function HomePage() {
       {/* ============================================================ */}
       {/* 9. STATS COUNTERS                                            */}
       {/* ============================================================ */}
-      <section className="bg-espresso text-cream py-16 border-y border-gold/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-espresso text-cream py-16 border-y border-gold/30 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gold/5 pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {stats.map((s) => (
               <div key={s.id} className="space-y-2">
@@ -457,16 +496,35 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/* 10. CLIENT TESTIMONIALS                                      */}
+      {/* 10. CLIENT TESTIMONIALS (WITH SMOOTH SLIDER)                */}
       {/* ============================================================ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-3 mb-12">
-          <span className="text-xs font-bold text-gold uppercase tracking-widest">
-            {language === "ar" ? "شهادات نعتز بها" : "Client Voices"}
-          </span>
-          <h2 className="text-3xl font-bold text-espresso">
-            {language === "ar" ? "ماذا يقول عملاؤنا عن تجربتهم مع طراز؟" : "Trusted by Discerning Homeowners & Designers"}
-          </h2>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-12">
+          <div className="text-center sm:text-start space-y-2">
+            <span className="text-xs font-bold text-gold uppercase tracking-widest">
+              {language === "ar" ? "شهادات نعتز بها" : "Client Voices"}
+            </span>
+            <h2 className="text-3xl font-bold text-espresso">
+              {language === "ar" ? "ماذا يقول عملاؤنا عن تجربتهم مع طراز؟" : "Trusted by Discerning Homeowners & Designers"}
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setActiveTestimonial((prev) => (prev > 0 ? prev - 1 : testimonials.length - 1))}
+              aria-label="Previous Testimonial"
+              className="w-10 h-10 rounded-full border border-gold/40 flex items-center justify-center text-espresso hover:bg-gold hover:text-white transition-all shadow-sm active:scale-95"
+            >
+              {language === "ar" ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+            </button>
+            <button
+              onClick={() => setActiveTestimonial((prev) => (prev < testimonials.length - 1 ? prev + 1 : 0))}
+              aria-label="Next Testimonial"
+              className="w-10 h-10 rounded-full border border-gold/40 flex items-center justify-center text-espresso hover:bg-gold hover:text-white transition-all shadow-sm active:scale-95"
+            >
+              {language === "ar" ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         <RevealStagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -475,21 +533,29 @@ export default function HomePage() {
               key={t.id}
               staggerIndex={idx}
               variant="up"
-              className="p-6 rounded-2xl bg-cream-dark/60 border border-gold/25 hover:border-gold transition-all duration-300 flex flex-col justify-between space-y-4"
+              className="h-full"
             >
-              <div className="space-y-3">
-                <div className="flex text-gold text-sm">
-                  {"★".repeat(t.rating)}
-                </div>
-                <p className="text-xs text-espresso/90 leading-relaxed italic">
-                  &ldquo;{localize(t.content)}&rdquo;
-                </p>
-              </div>
+              <TiltCard maxTilt={4} className="h-full">
+                <div
+                  className={`p-6 rounded-2xl bg-cream-dark/60 border transition-all duration-300 flex flex-col justify-between space-y-4 h-full ${
+                    idx === activeTestimonial ? "border-gold shadow-xl scale-[1.02]" : "border-gold/25 hover:border-gold"
+                  }`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex text-gold text-sm">
+                      {"★".repeat(t.rating)}
+                    </div>
+                    <p className="text-xs text-espresso/90 leading-relaxed italic">
+                      &ldquo;{localize(t.content)}&rdquo;
+                    </p>
+                  </div>
 
-              <div className="pt-3 border-t border-gold/15">
-                <h4 className="text-xs font-bold text-espresso">{localize(t.name)}</h4>
-                <span className="text-[11px] text-taupe block">{localize(t.roleLocation)}</span>
-              </div>
+                  <div className="pt-3 border-t border-gold/15">
+                    <h4 className="text-xs font-bold text-espresso">{localize(t.name)}</h4>
+                    <span className="text-[11px] text-taupe block">{localize(t.roleLocation)}</span>
+                  </div>
+                </div>
+              </TiltCard>
             </Reveal>
           ))}
         </RevealStagger>
@@ -541,7 +607,7 @@ export default function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/* 12. FINAL CTA BANNER                                         */}
+      {/* 12. FINAL CTA BANNER (PARALLAX + PULSE)                     */}
       {/* ============================================================ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <Reveal
@@ -549,12 +615,14 @@ export default function HomePage() {
           className="relative rounded-3xl overflow-hidden bg-espresso text-cream p-8 sm:p-14 lg:p-16 border border-gold/40 shadow-2xl text-center space-y-6"
         >
           <div className="absolute inset-0 z-0">
-            <Image
-              src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=80"
-              alt="Kitchen Interior"
-              fill
-              className="object-cover opacity-15"
-            />
+            <Parallax speed={0.2} className="w-full h-[120%] -top-[10%]">
+              <Image
+                src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=80"
+                alt="Kitchen Interior"
+                fill
+                className="object-cover opacity-20"
+              />
+            </Parallax>
             <div className="absolute inset-0 bg-gradient-to-r from-espresso via-espresso/90 to-espresso" />
           </div>
 
@@ -564,9 +632,13 @@ export default function HomePage() {
             </span>
 
             <h2 className="text-3xl sm:text-5xl font-extrabold text-cream leading-tight">
-              {language === "ar"
-                ? "جاهز لتحويل منزلك أو مكتبك إلى مساحة تفيض بالفخامة؟"
-                : "Ready to Transform Your Living or Work Space?"}
+              <SplitText
+                text={
+                  language === "ar"
+                    ? "جاهز لتحويل منزلك إلى مساحة تفيض بالفخامة؟"
+                    : "Ready to Transform Your Living Space?"
+                }
+              />
             </h2>
 
             <p className="text-sm sm:text-base text-cream/80">
@@ -576,23 +648,27 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              <Link
-                href="/quote"
-                className="px-8 py-3.5 rounded-full bg-gold text-espresso font-bold text-xs uppercase tracking-wider hover:bg-gold-light transition-all flex items-center gap-2 shadow-xl"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>{language === "ar" ? "طلب عرض سعر ومقايسة مجانية" : "Request a Quote & Survey"}</span>
-              </Link>
+              <Magnetic strength={0.3}>
+                <Link
+                  href="/quote"
+                  className="px-8 py-3.5 rounded-full bg-gold text-espresso font-bold text-xs uppercase tracking-wider hover:bg-gold-light transition-all flex items-center gap-2 shadow-xl pulse-gold active:scale-95"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>{language === "ar" ? "طلب عرض سعر ومقايسة مجانية" : "Request a Quote & Survey"}</span>
+                </Link>
+              </Magnetic>
 
-              <a
-                href="https://wa.me/201005423809"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-6 py-3.5 rounded-full bg-[#25D366] text-white font-bold text-xs flex items-center gap-2 hover:bg-green-600 transition-colors shadow-lg"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>{language === "ar" ? "محادثة فورية على واتساب" : "Chat on WhatsApp"}</span>
-              </a>
+              <Magnetic strength={0.3}>
+                <a
+                  href="https://wa.me/201005423809"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3.5 rounded-full bg-[#25D366] text-white font-bold text-xs flex items-center gap-2 hover:bg-green-600 transition-colors shadow-lg active:scale-95"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>{language === "ar" ? "محادثة فورية على واتساب" : "Chat on WhatsApp"}</span>
+                </a>
+              </Magnetic>
             </div>
           </div>
         </Reveal>

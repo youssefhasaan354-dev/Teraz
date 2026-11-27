@@ -5,30 +5,47 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Search, Globe, Menu, X, ChevronDown, Sparkles, Phone, MessageCircle } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getCategories } from "@/lib/firebase/firestore-service";
 import { Category } from "@/lib/types";
+import { initialCategories } from "@/lib/initial-data";
 import { GlobalSearch } from "./GlobalSearch";
+import { ScrollProgress } from "../motion/ScrollProgress";
 
 export function Header() {
   const { language, toggleLanguage, localize } = useLanguage();
   const pathname = usePathname();
+  const shouldReduceMotion = useReducedMotion();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
 
   useEffect(() => {
-    getCategories().then(setCategories);
+    getCategories().then((res) => {
+      if (res && res.length > 0) setCategories(res);
+    });
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 20);
+
+      // Hide on scroll down past hero, show on scroll up
+      if (currentScrollY > 120 && currentScrollY > lastScrollY) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      setLastScrollY(currentScrollY);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   // Close menus on route change
   useEffect(() => {
@@ -47,10 +64,13 @@ export function Header() {
 
   return (
     <>
+      <ScrollProgress />
       <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 transform ${
+          isVisible ? "translate-y-0" : "-translate-y-full"
+        } ${
           isScrolled
-            ? "bg-cream/90 backdrop-blur-md shadow-md py-2.5 border-b border-gold/20"
+            ? "bg-cream/92 backdrop-blur-md shadow-md py-2.5 border-b border-gold/20"
             : "bg-transparent py-4"
         }`}
       >
@@ -101,51 +121,66 @@ export function Header() {
                   />
                 </button>
 
-                {/* Mega Menu Dropdown */}
-                {megaMenuOpen && (
-                  <div className="absolute top-full right-0 lg:-right-36 w-[720px] bg-cream/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gold/30 p-6 z-50 animate-fadeIn">
-                    <div className="grid grid-cols-3 gap-4">
-                      {categories.map((cat) => (
+                {/* Staggered Mega Menu Dropdown */}
+                <AnimatePresence>
+                  {megaMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.22, ease: "easeOut" }}
+                      className="absolute top-full -left-20 rtl:-right-20 mt-2 w-[540px] p-4 bg-espresso text-cream rounded-3xl shadow-2xl border border-gold/40 z-50 overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between pb-3 border-b border-gold/20 mb-3 px-2">
+                        <span className="text-[11px] font-bold text-gold-light uppercase tracking-widest">
+                          {language === "ar" ? "التخصصات الرئيسية" : "Signature Disciplines"}
+                        </span>
                         <Link
-                          key={cat.id}
-                          href={`/categories/${cat.slug}`}
-                          className="group p-3 rounded-xl hover:bg-cream-dark/80 transition-all border border-transparent hover:border-gold/20 flex flex-col gap-2"
+                          href="/categories"
+                          className="text-[11px] text-cream/70 hover:text-gold transition-colors"
                         >
-                          <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden">
-                            <Image
-                              src={cat.coverImage}
-                              alt={localize(cat.name)}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                            <div className="absolute inset-0 bg-espresso/20 group-hover:bg-transparent transition-colors" />
-                          </div>
-                          <div>
-                            <h4 className="text-xs font-bold text-espresso group-hover:text-gold transition-colors">
-                              {localize(cat.name)}
-                            </h4>
-                            <p className="text-[11px] text-taupe line-clamp-1 mt-0.5">
-                              {localize(cat.description)}
-                            </p>
-                          </div>
+                          {language === "ar" ? "عرض كافة الأقسام ←" : "View All Categories →"}
                         </Link>
-                      ))}
-                    </div>
+                      </div>
 
-                    <div className="mt-4 pt-3 border-t border-gold/20 flex items-center justify-between text-xs text-taupe">
-                      <span>{language === "ar" ? "تفصيل خاص لجميع الأبعاد حسب رغبتك" : "Custom fabrication to your exact spatial needs"}</span>
-                      <Link
-                        href="/categories"
-                        className="text-gold font-bold hover:underline flex items-center gap-1"
-                      >
-                        {language === "ar" ? "عرض كافة الأقسام ←" : "Explore All Categories →"}
-                      </Link>
-                    </div>
-                  </div>
-                )}
+                      <div className="grid grid-cols-2 gap-2.5">
+                        {categories.map((cat, idx) => (
+                          <motion.div
+                            key={cat.id}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.04 }}
+                          >
+                            <Link
+                              href={`/categories/${cat.slug}`}
+                              className="group/item flex items-center gap-3 p-2 rounded-2xl hover:bg-cream/10 transition-colors border border-transparent hover:border-gold/20"
+                            >
+                              <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-gold/30">
+                                <Image
+                                  src={cat.coverImage}
+                                  alt={localize(cat.name)}
+                                  fill
+                                  className="object-cover group-hover/item:scale-110 transition-transform duration-500"
+                                />
+                              </div>
+                              <div className="overflow-hidden">
+                                <span className="text-xs font-bold text-cream group-hover/item:text-gold-light transition-colors block truncate">
+                                  {localize(cat.name)}
+                                </span>
+                                <span className="text-[10px] text-cream/60 block truncate">
+                                  {localize(cat.description)}
+                                </span>
+                              </div>
+                            </Link>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              {/* Other Links */}
+              {/* Remaining Nav Links */}
               {navLinks.slice(1).map((link) => (
                 <Link
                   key={link.href}
@@ -154,7 +189,7 @@ export function Header() {
                     pathname === link.href
                       ? "text-espresso bg-gold/15 font-bold"
                       : link.highlight
-                      ? "text-gold font-bold bg-gold/10 hover:bg-gold hover:text-white"
+                      ? "text-gold font-bold bg-gold/10 hover:bg-gold hover:text-espresso"
                       : "text-espresso/80 hover:text-espresso hover:bg-cream-dark/60"
                   }`}
                 >
@@ -165,149 +200,142 @@ export function Header() {
 
             {/* Actions: Search, Language, Quote CTA */}
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Search Button */}
+              {/* Search Modal Trigger */}
               <button
                 onClick={() => setSearchOpen(true)}
-                aria-label="Global Search"
-                className="w-9 h-9 rounded-full flex items-center justify-center text-espresso/80 hover:text-espresso hover:bg-cream-dark/80 transition-colors border border-transparent hover:border-gold/30"
+                aria-label="Search"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-espresso/80 hover:text-espresso hover:bg-cream-dark/60 transition-colors"
               >
                 <Search className="w-4 h-4" />
               </button>
 
-              {/* Language Switch */}
+              {/* Language Toggle */}
               <button
                 onClick={toggleLanguage}
-                aria-label="Switch Language"
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-semibold text-espresso/80 hover:text-espresso hover:bg-cream-dark/80 transition-colors border border-gold/30"
+                aria-label="Toggle language"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-espresso border border-gold/30 hover:border-gold hover:bg-gold/10 transition-all"
               >
                 <Globe className="w-3.5 h-3.5 text-gold" />
                 <span>{language === "ar" ? "EN" : "عربي"}</span>
               </button>
 
-              {/* Request a Quote CTA */}
+              {/* Quote CTA Button */}
               <Link
                 href="/quote"
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-espresso text-cream text-xs font-semibold tracking-wide hover:bg-black border border-gold/40 shadow-sm transition-all hover:scale-105"
+                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold text-espresso font-bold text-xs uppercase tracking-wider hover:bg-gold-light transition-all shadow-md active:scale-95"
               >
-                <Sparkles className="w-3.5 h-3.5 text-gold-light" />
-                <span>{language === "ar" ? "اطلب عرض سعر" : "Request a Quote"}</span>
+                <Sparkles className="w-3.5 h-3.5 text-espresso" />
+                <span>{language === "ar" ? "عرض سعر" : "Quote"}</span>
               </Link>
 
-              {/* Mobile Hamburger Toggle */}
+              {/* Mobile Menu Hamburger */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle Mobile Menu"
-                className="lg:hidden p-2 rounded-xl text-espresso hover:bg-cream-dark/80"
+                className="lg:hidden w-10 h-10 rounded-full flex items-center justify-center text-espresso hover:bg-cream-dark/60 transition-colors"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Global Search Modal */}
-      <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-
-      {/* Mobile Full-Screen Overlay Menu */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-cream/98 backdrop-blur-2xl flex flex-col justify-between p-6 overflow-y-auto lg:hidden animate-fadeIn">
-          {/* Top Bar inside Overlay */}
-          <div className="flex items-center justify-between pb-6 border-b border-gold/20">
-            <div className="relative w-36 h-10">
-              <Image
-                src="/brand/logo-full.svg"
-                alt="TERAZ"
-                fill
-                className="object-contain"
-              />
+      {/* Full-Screen Mobile Drawer with Staggered Entrance */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-espresso/95 backdrop-blur-xl flex flex-col justify-between p-6 text-cream lg:hidden"
+          >
+            <div className="flex items-center justify-between pb-6 border-b border-gold/20">
+              <div className="relative w-36 h-10">
+                <Image
+                  src="/brand/logo-light.svg"
+                  alt="TERAZ"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-10 h-10 rounded-full border border-gold/40 flex items-center justify-center text-gold hover:bg-gold hover:text-espresso transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-full bg-cream-dark text-espresso hover:bg-gold/20"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
 
-          {/* Links List */}
-          <div className="py-8 space-y-4">
-            <Link
-              href="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-xl font-bold text-espresso hover:text-gold transition-colors"
+            <motion.nav
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: { transition: { staggerChildren: 0.08 } },
+              }}
+              className="py-8 space-y-4 text-center overflow-y-auto"
             >
-              {language === "ar" ? "الرئيسية" : "Home"}
-            </Link>
-
-            {/* Categories Mobile Expand */}
-            <div className="space-y-2 pt-2 border-t border-gold/15">
-              <span className="text-xs font-bold text-gold uppercase tracking-wider block">
-                {language === "ar" ? "أقسام الأثاث والمطابخ" : "Categories"}
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                {categories.map((c) => (
+              {[
+                { href: "/", label: language === "ar" ? "الرئيسية" : "Home" },
+                { href: "/categories", label: language === "ar" ? "أقسامنا الفاخرة" : "Disciplines" },
+                { href: "/products", label: language === "ar" ? "كتالوج التصاميم" : "Bespoke Products" },
+                { href: "/projects", label: language === "ar" ? "أعمالنا ومشاريعنا" : "Projects" },
+                { href: "/configurator", label: language === "ar" ? "صمّم مطبخك تفاعليًا" : "Configurator", highlight: true },
+                { href: "/materials", label: language === "ar" ? "الخامات والتشطيبات" : "Materials" },
+                { href: "/about", label: language === "ar" ? "من نحن وقصتنا" : "About TERAZ" },
+                { href: "/services", label: language === "ar" ? "خدماتنا المتكاملة" : "Services" },
+                { href: "/faq", label: language === "ar" ? "الأسئلة الشائعة" : "FAQ" },
+                { href: "/contact", label: language === "ar" ? "تواصل معنا" : "Contact" },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.href}
+                  variants={{
+                    hidden: { opacity: 0, y: 15 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                >
                   <Link
-                    key={c.id}
-                    href={`/categories/${c.slug}`}
+                    href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-2.5 rounded-xl bg-cream-dark/70 text-xs font-semibold text-espresso flex items-center justify-between"
+                    className={`block py-2 text-lg font-bold transition-colors ${
+                      pathname === item.href
+                        ? "text-gold"
+                        : item.highlight
+                        ? "text-gold-light font-extrabold"
+                        : "text-cream/90 hover:text-gold"
+                    }`}
                   >
-                    <span>{localize(c.name)}</span>
-                    <span className="text-gold">←</span>
+                    {item.label}
                   </Link>
-                ))}
+                </motion.div>
+              ))}
+            </motion.nav>
+
+            <div className="pt-6 border-t border-gold/20 flex flex-col gap-3 text-center">
+              <Link
+                href="/quote"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3.5 rounded-full bg-gold text-espresso font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>{language === "ar" ? "طلب مقايسة وعرض سعر مجاني" : "Request Free Quote"}</span>
+              </Link>
+              <div className="flex items-center justify-center gap-4 pt-2 text-xs text-cream/70">
+                <a href="tel:+201005423809" className="hover:text-gold transition-colors">
+                  01005423809
+                </a>
+                <span>•</span>
+                <button onClick={toggleLanguage} className="text-gold font-bold">
+                  {language === "ar" ? "English Version" : "النسخة العربية"}
+                </button>
               </div>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            <div className="pt-4 space-y-3">
-              {navLinks.slice(1).map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block text-lg font-semibold transition-colors ${
-                    link.highlight ? "text-gold font-bold" : "text-espresso/90 hover:text-espresso"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom CTAs */}
-          <div className="pt-6 border-t border-gold/20 space-y-3">
-            <Link
-              href="/quote"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full py-3.5 rounded-full bg-espresso text-cream text-sm font-bold flex items-center justify-center gap-2 border border-gold/40 shadow-lg"
-            >
-              <Sparkles className="w-4 h-4 text-gold-light" />
-              <span>{language === "ar" ? "اطلب مقايسة وعرض سعر مجاني" : "Request Free Quote & Survey"}</span>
-            </Link>
-
-            <div className="flex items-center gap-3">
-              <a
-                href="https://wa.me/201005423809"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 py-2.5 rounded-full bg-[#25D366] text-white text-xs font-bold flex items-center justify-center gap-2"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>{language === "ar" ? "واتساب مباشر" : "WhatsApp"}</span>
-              </a>
-              <a
-                href="tel:+201005423809"
-                className="flex-1 py-2.5 rounded-full bg-cream-dark text-espresso border border-gold/40 text-xs font-bold flex items-center justify-center gap-2"
-              >
-                <Phone className="w-4 h-4" />
-                <span>{language === "ar" ? "اتصال هاتف" : "Call"}</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Global Search Modal */}
+      <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

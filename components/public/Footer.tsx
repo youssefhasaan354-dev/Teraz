@@ -3,33 +3,52 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Phone, Mail, Clock, MapPin, Instagram, Facebook, ArrowUpRight, ShieldCheck } from "lucide-react";
+import { Phone, Mail, Clock, ShieldCheck, ArrowUp, Facebook, Instagram } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getSiteSettings, getCategories } from "@/lib/firebase/firestore-service";
 import { SiteSettings, Category } from "@/lib/types";
+import { initialCategories } from "@/lib/initial-data";
+import { Reveal, RevealStagger } from "../motion/Reveal";
 
 export function Footer() {
   const { language, localize } = useLanguage();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     getSiteSettings().then(setSettings);
-    getCategories().then(setCategories);
+    getCategories().then((res) => {
+      if (res && res.length > 0) setCategories(res);
+    });
+
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalScroll > 0) {
+        setScrollProgress((window.scrollY / totalScroll) * 100);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <footer className="bg-espresso text-cream pt-16 pb-8 border-t border-gold/30 relative overflow-hidden">
-      {/* Decorative Background Glow */}
+      {/* Decorative Background Glows */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-12 border-b border-cream/10">
+        <RevealStagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-12 border-b border-cream/10">
           {/* Column 1: Brand Info & Tagline */}
-          <div className="lg:col-span-2 space-y-4">
-            <Link href="/" className="inline-block">
-              <div className="relative w-52 h-14">
+          <Reveal variant="up" staggerIndex={0} className="lg:col-span-2 space-y-4">
+            <Link href="/" className="inline-block group">
+              <div className="relative w-52 h-14 transition-transform duration-300 group-hover:scale-105">
                 <Image
                   src="/brand/logo-light.svg"
                   alt="TERAZ Furniture & Kitchens"
@@ -63,10 +82,10 @@ export function Footer() {
                 ? "نخدمكم بنظام الأونلاين والتوريد المباشر — نوصّل ونركّب في جميع محافظات مصر."
                 : "Serving you online with direct nationwide delivery & assembly across Egypt."}
             </p>
-          </div>
+          </Reveal>
 
           {/* Column 2: Categories */}
-          <div>
+          <Reveal variant="up" staggerIndex={1}>
             <h4 className="text-xs font-bold uppercase tracking-widest text-gold-light mb-4">
               {language === "ar" ? "أقسامنا" : "Disciplines"}
             </h4>
@@ -85,10 +104,10 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Reveal>
 
           {/* Column 3: Quick Links */}
-          <div>
+          <Reveal variant="up" staggerIndex={2}>
             <h4 className="text-xs font-bold uppercase tracking-widest text-gold-light mb-4">
               {language === "ar" ? "روابط سريعة" : "Quick Links"}
             </h4>
@@ -124,10 +143,10 @@ export function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
+          </Reveal>
 
           {/* Column 4: Contact & Socials */}
-          <div>
+          <Reveal variant="up" staggerIndex={3}>
             <h4 className="text-xs font-bold uppercase tracking-widest text-gold-light mb-4">
               {language === "ar" ? "بيانات التواصل" : "Get In Touch"}
             </h4>
@@ -186,10 +205,10 @@ export function Footer() {
                 <Instagram className="w-4 h-4" />
               </a>
             </div>
-          </div>
-        </div>
+          </Reveal>
+        </RevealStagger>
 
-        {/* Bottom Bar: Copyright & Policy Links */}
+        {/* Bottom Bar: Copyright & Back to Top with Circular Progress */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-cream/50">
           <p>
             {language === "ar"
@@ -204,6 +223,36 @@ export function Footer() {
             <Link href="/terms" className="hover:text-cream transition-colors">
               {language === "ar" ? "الشروط والأحكام" : "Terms & Conditions"}
             </Link>
+
+            {/* Back to top with Circular SVG Progress Ring */}
+            <button
+              onClick={scrollToTop}
+              aria-label="Scroll to top"
+              className="relative w-10 h-10 rounded-full bg-cream/10 border border-gold/40 flex items-center justify-center text-gold hover:bg-gold hover:text-espresso transition-all shadow-md active:scale-95 group"
+            >
+              <svg className="w-10 h-10 absolute inset-0 -rotate-90 pointer-events-none" viewBox="0 0 36 36">
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  className="stroke-cream/10"
+                  strokeWidth="2.5"
+                />
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="16"
+                  fill="none"
+                  className="stroke-gold transition-all duration-150"
+                  strokeWidth="2.5"
+                  strokeDasharray="100"
+                  strokeDashoffset={100 - scrollProgress}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <ArrowUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+            </button>
           </div>
         </div>
       </div>
