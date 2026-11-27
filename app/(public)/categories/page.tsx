@@ -7,13 +7,16 @@ import { Sparkles, ArrowRight, ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getCategories } from "@/lib/firebase/firestore-service";
 import { Category } from "@/lib/types";
+import { initialCategories } from "@/lib/initial-data";
 
 export default function CategoriesPage() {
   const { language, localize } = useLanguage();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
 
   useEffect(() => {
-    getCategories().then(setCategories);
+    getCategories().then((res) => {
+      if (res && res.length > 0) setCategories(res);
+    });
   }, []);
 
   return (

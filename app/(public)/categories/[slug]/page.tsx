@@ -8,15 +8,19 @@ import { Sparkles, MessageCircle, Phone, ArrowLeft, ArrowRight, Check } from "lu
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getCategories, getProducts } from "@/lib/firebase/firestore-service";
 import { Category, Product } from "@/lib/types";
+import { initialCategories, initialProducts } from "@/lib/initial-data";
 
 export default function CategoryDetailPage() {
   const params = useParams();
   const slug = params?.slug as string;
   const { language, localize } = useLanguage();
-  const [category, setCategory] = useState<Category | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
+  const seedCat = initialCategories.find((c) => c.slug === slug);
+  const seedProds = seedCat ? initialProducts.filter((p) => p.categoryId === seedCat.id) : [];
+
+  const [category, setCategory] = useState<Category | null>(seedCat || null);
+  const [products, setProducts] = useState<Product[]>(seedProds);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!seedCat);
 
   useEffect(() => {
     Promise.all([getCategories(), getProducts()]).then(([cats, prods]) => {

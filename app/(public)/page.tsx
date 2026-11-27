@@ -28,6 +28,14 @@ import {
   getServices,
 } from "@/lib/firebase/firestore-service";
 import {
+  initialCategories,
+  initialProjects,
+  initialTestimonials,
+  initialFAQs,
+  initialStats,
+  initialServices,
+} from "@/lib/initial-data";
+import {
   Category,
   Project,
   Testimonial,
@@ -47,21 +55,21 @@ import { KitchenConfigurator } from "@/components/public/KitchenConfigurator";
 
 export default function HomePage() {
   const { language, localize } = useLanguage();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [faqs, setFaqs] = useState<FAQItem[]>([]);
-  const [stats, setStats] = useState<StatItem[]>([]);
-  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
+  const [faqs, setFaqs] = useState<FAQItem[]>(initialFAQs);
+  const [stats, setStats] = useState<StatItem[]>(initialStats);
+  const [services, setServices] = useState<ServiceItem[]>(initialServices);
   const [openFaq, setOpenFaq] = useState<string | null>("faq-1");
 
   useEffect(() => {
-    getCategories().then(setCategories);
-    getProjects().then(setProjects);
-    getTestimonials().then(setTestimonials);
-    getFAQs().then(setFaqs);
-    getStats().then(setStats);
-    getServices().then(setServices);
+    getCategories().then((res) => { if (res && res.length > 0) setCategories(res); });
+    getProjects().then((res) => { if (res && res.length > 0) setProjects(res); });
+    getTestimonials().then((res) => { if (res && res.length > 0) setTestimonials(res); });
+    getFAQs().then((res) => { if (res && res.length > 0) setFaqs(res); });
+    getStats().then((res) => { if (res && res.length > 0) setStats(res); });
+    getServices().then((res) => { if (res && res.length > 0) setServices(res); });
   }, []);
 
   const marqueeItems =

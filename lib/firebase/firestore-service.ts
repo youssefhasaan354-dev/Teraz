@@ -136,19 +136,34 @@ class ResilientLocalStore {
     if (typeof window === "undefined") return;
     try {
       const s = localStorage.getItem("teraz_store_settings");
-      if (s) this.settings = JSON.parse(s);
+      if (s) {
+        const parsed = JSON.parse(s);
+        if (parsed && typeof parsed === "object") this.settings = { ...initialSiteSettings, ...parsed };
+      }
 
       const c = localStorage.getItem("teraz_store_categories");
-      if (c) this.categories = JSON.parse(c);
+      if (c) {
+        const parsed = JSON.parse(c);
+        if (Array.isArray(parsed) && parsed.length > 0) this.categories = parsed;
+      }
 
       const p = localStorage.getItem("teraz_store_products");
-      if (p) this.products = JSON.parse(p);
+      if (p) {
+        const parsed = JSON.parse(p);
+        if (Array.isArray(parsed) && parsed.length > 0) this.products = parsed;
+      }
 
       const pr = localStorage.getItem("teraz_store_projects");
-      if (pr) this.projects = JSON.parse(pr);
+      if (pr) {
+        const parsed = JSON.parse(pr);
+        if (Array.isArray(parsed) && parsed.length > 0) this.projects = parsed;
+      }
 
       const cf = localStorage.getItem("teraz_store_configurator");
-      if (cf) this.configurator = JSON.parse(cf);
+      if (cf) {
+        const parsed = JSON.parse(cf);
+        if (Array.isArray(parsed) && parsed.length > 0) this.configurator = parsed;
+      }
 
       const l = localStorage.getItem("teraz_store_leads");
       if (l) this.leads = JSON.parse(l);
@@ -171,7 +186,7 @@ class ResilientLocalStore {
 
   // Settings
   getSettings(): SiteSettings {
-    return this.settings;
+    return this.settings || initialSiteSettings;
   }
   updateSettings(data: Partial<SiteSettings>): SiteSettings {
     this.settings = { ...this.settings, ...data, updatedAt: new Date().toISOString() };
@@ -181,10 +196,12 @@ class ResilientLocalStore {
 
   // Categories
   getCategories(): Category[] {
-    return [...this.categories].sort((a, b) => a.order - b.order);
+    const list = this.categories && this.categories.length > 0 ? this.categories : initialCategories;
+    return [...list].sort((a, b) => a.order - b.order);
   }
   getCategoryBySlug(slug: string): Category | undefined {
-    return this.categories.find((c) => c.slug === slug);
+    const list = this.categories && this.categories.length > 0 ? this.categories : initialCategories;
+    return list.find((c) => c.slug === slug);
   }
   saveCategory(cat: Category): Category {
     const idx = this.categories.findIndex((c) => c.id === cat.id);
@@ -203,10 +220,11 @@ class ResilientLocalStore {
 
   // Products
   getProducts(): Product[] {
-    return [...this.products];
+    return this.products && this.products.length > 0 ? [...this.products] : [...initialProducts];
   }
   getProductBySlug(slug: string): Product | undefined {
-    return this.products.find((p) => p.slug === slug);
+    const list = this.products && this.products.length > 0 ? this.products : initialProducts;
+    return list.find((p) => p.slug === slug);
   }
   saveProduct(prod: Product): Product {
     const idx = this.products.findIndex((p) => p.id === prod.id);
@@ -225,10 +243,11 @@ class ResilientLocalStore {
 
   // Projects
   getProjects(): Project[] {
-    return [...this.projects];
+    return this.projects && this.projects.length > 0 ? [...this.projects] : [...initialProjects];
   }
   getProjectBySlug(slug: string): Project | undefined {
-    return this.projects.find((p) => p.slug === slug);
+    const list = this.projects && this.projects.length > 0 ? this.projects : initialProjects;
+    return list.find((p) => p.slug === slug);
   }
   saveProject(proj: Project): Project {
     const idx = this.projects.findIndex((p) => p.id === proj.id);
@@ -340,7 +359,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       console.warn("Firestore settings read failed, falling back to local:", e);
     }
   }
-  return localStore.getSettings();
+  const s = localStore.getSettings();
+  return s || initialSiteSettings;
 }
 
 export async function updateSiteSettings(settings: Partial<SiteSettings>): Promise<SiteSettings> {
@@ -366,12 +386,15 @@ export async function getCategories(): Promise<Category[]> {
       console.warn("Firestore categories read failed, falling back to local:", e);
     }
   }
-  return localStore.getCategories();
+  const local = localStore.getCategories();
+  return local && local.length > 0 ? local : initialCategories;
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
   const categories = await getCategories();
-  return categories.find((c) => c.slug === slug);
+  const found = categories.find((c) => c.slug === slug);
+  if (found) return found;
+  return initialCategories.find((c) => c.slug === slug);
 }
 
 export async function saveCategory(category: Category): Promise<Category> {
@@ -403,20 +426,23 @@ export async function getProducts(categoryId?: string): Promise<Product[]> {
       if (!snap.empty) {
         let items = snap.docs.map((d) => ({ ...d.data(), id: d.id } as Product));
         if (categoryId) items = items.filter((p) => p.categoryId === categoryId);
-        return items;
+        if (items.length > 0) return items;
       }
     } catch (e) {
       console.warn("Firestore products read failed, falling back to local:", e);
     }
   }
   let prods = localStore.getProducts();
+  if (!prods || prods.length === 0) prods = initialProducts;
   if (categoryId) prods = prods.filter((p) => p.categoryId === categoryId);
   return prods;
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
   const prods = await getProducts();
-  return prods.find((p) => p.slug === slug);
+  const found = prods.find((p) => p.slug === slug);
+  if (found) return found;
+  return initialProducts.find((p) => p.slug === slug);
 }
 
 export async function saveProduct(product: Product): Promise<Product> {
@@ -452,12 +478,15 @@ export async function getProjects(): Promise<Project[]> {
       console.warn("Firestore projects read failed, falling back to local:", e);
     }
   }
-  return localStore.getProjects();
+  const local = localStore.getProjects();
+  return local && local.length > 0 ? local : initialProjects;
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | undefined> {
   const projects = await getProjects();
-  return projects.find((p) => p.slug === slug);
+  const found = projects.find((p) => p.slug === slug);
+  if (found) return found;
+  return initialProjects.find((p) => p.slug === slug);
 }
 
 export async function saveProject(project: Project): Promise<Project> {
@@ -483,7 +512,8 @@ export async function deleteProject(id: string): Promise<void> {
 }
 
 export async function getConfiguratorOptions(): Promise<ConfiguratorOption[]> {
-  return localStore.getConfiguratorOptions();
+  const res = localStore.getConfiguratorOptions();
+  return res && res.length > 0 ? res : initialConfiguratorOptions;
 }
 
 export async function saveConfiguratorOption(opt: ConfiguratorOption): Promise<ConfiguratorOption> {
@@ -495,19 +525,23 @@ export async function deleteConfiguratorOption(id: string): Promise<void> {
 }
 
 export async function getTestimonials(): Promise<Testimonial[]> {
-  return localStore.getTestimonials();
+  const res = localStore.getTestimonials();
+  return res && res.length > 0 ? res : initialTestimonials;
 }
 
 export async function getFAQs(): Promise<FAQItem[]> {
-  return localStore.getFAQs();
+  const res = localStore.getFAQs();
+  return res && res.length > 0 ? res : initialFAQs;
 }
 
 export async function getStats(): Promise<StatItem[]> {
-  return localStore.getStats();
+  const res = localStore.getStats();
+  return res && res.length > 0 ? res : initialStats;
 }
 
 export async function getServices(): Promise<ServiceItem[]> {
-  return localStore.getServices();
+  const res = localStore.getServices();
+  return res && res.length > 0 ? res : initialServices;
 }
 
 export async function getLeads(): Promise<Lead[]> {

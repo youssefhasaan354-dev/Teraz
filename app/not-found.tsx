@@ -2,23 +2,64 @@
 
 import React from "react";
 import Link from "next/link";
-import { Home } from "lucide-react";
+import Image from "next/image";
+import { Home, Sparkles, MessageCircle } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-export default function RootNotFound() {
+export default function NotFound() {
+  const { language } = useLanguage();
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F2EA] text-[#1C1512] px-4 text-center">
-      <span className="text-7xl font-serif font-extrabold text-[#B38B54] mb-4">404</span>
-      <h1 className="text-2xl font-bold mb-2">الصفحة غير موجودة • Page Not Found</h1>
-      <p className="text-sm text-[#8A7762] max-w-sm mb-6">
-        عذرًا، الصفحة غير متوفرة. يمكنك العودة للصفحة الرئيسية لعلامة طراز للأثاث والمطابخ.
-      </p>
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1C1512] text-[#F7F2EA] text-xs font-bold hover:bg-[#B38B54] transition-all"
-      >
-        <Home className="w-4 h-4" />
-        <span>العودة إلى الرئيسية • Return Home</span>
-      </Link>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-cream text-espresso px-4 text-center relative overflow-hidden py-16">
+      {/* Ambient background lighting */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[400px] bg-gold/10 rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="relative z-10 max-w-md mx-auto space-y-6">
+        {/* Brand Lockup */}
+        <div className="relative w-40 h-12 mx-auto mb-2">
+          <Image
+            src="/brand/logo-full.svg"
+            alt="TERAZ Furniture & Kitchens"
+            fill
+            priority
+            className="object-contain"
+          />
+        </div>
+
+        <span className="text-7xl sm:text-8xl font-serif font-extrabold text-gold block tracking-tighter">
+          404
+        </span>
+
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-espresso">
+          {language === "ar" ? "الصفحة غير موجودة" : "Page Not Found"}
+        </h1>
+
+        <p className="text-xs sm:text-sm text-taupe leading-relaxed">
+          {language === "ar"
+            ? "عذرًا، يبدو أن الصفحة التي تبحث عنها قد تم نقلها أو لم تعد متاحة. تفضل بالعودة للصفحة الرئيسية واستكشاف أرقى التصاميم والمطابخ."
+            : "The page you are looking for has been relocated or is unavailable. Please return home to explore our bespoke designs and kitchens."}
+        </p>
+
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-espresso text-cream text-xs font-bold hover:bg-gold hover:text-espresso transition-all shadow-xl"
+          >
+            <Home className="w-4 h-4" />
+            <span>{language === "ar" ? "العودة إلى الرئيسية" : "Return to Home"}</span>
+          </Link>
+
+          <a
+            href="https://wa.me/201005423809"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-cream-dark border border-gold/40 text-espresso text-xs font-bold hover:bg-gold/20 transition-all"
+          >
+            <MessageCircle className="w-4 h-4 text-gold" />
+            <span>{language === "ar" ? "تواصل معنا واتساب" : "WhatsApp Support"}</span>
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

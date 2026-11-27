@@ -7,16 +7,21 @@ import { Sparkles, MapPin, Clock } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getProjects, getCategories } from "@/lib/firebase/firestore-service";
 import { Project, Category } from "@/lib/types";
+import { initialProjects, initialCategories } from "@/lib/initial-data";
 
 export default function ProjectsPage() {
   const { language, localize } = useLanguage();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [selectedCat, setSelectedCat] = useState<string>("all");
 
   useEffect(() => {
-    getProjects().then(setProjects);
-    getCategories().then(setCategories);
+    getProjects().then((res) => {
+      if (res && res.length > 0) setProjects(res);
+    });
+    getCategories().then((res) => {
+      if (res && res.length > 0) setCategories(res);
+    });
   }, []);
 
   const filtered =

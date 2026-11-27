@@ -7,16 +7,21 @@ import { Sparkles, MessageCircle, Filter } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getProducts, getCategories } from "@/lib/firebase/firestore-service";
 import { Product, Category } from "@/lib/types";
+import { initialProducts, initialCategories } from "@/lib/initial-data";
 
 export default function ProductsPage() {
   const { language, localize } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   useEffect(() => {
-    getProducts().then(setProducts);
-    getCategories().then(setCategories);
+    getProducts().then((res) => {
+      if (res && res.length > 0) setProducts(res);
+    });
+    getCategories().then((res) => {
+      if (res && res.length > 0) setCategories(res);
+    });
   }, []);
 
   const filtered =

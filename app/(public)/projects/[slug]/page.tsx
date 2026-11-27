@@ -8,14 +8,16 @@ import { Sparkles, MapPin, Clock, MessageCircle, ArrowLeft, ArrowRight } from "l
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getProjectBySlug, getProjects } from "@/lib/firebase/firestore-service";
 import { Project } from "@/lib/types";
+import { initialProjects } from "@/lib/initial-data";
 import { BeforeAfter } from "@/components/motion/BeforeAfter";
 
 export default function ProjectDetailPage() {
   const params = useParams();
   const slug = params?.slug as string;
   const { language, localize } = useLanguage();
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
+  const seedProj = initialProjects.find((p) => p.slug === slug);
+  const [project, setProject] = useState<Project | null>(seedProj || null);
+  const [loading, setLoading] = useState(!seedProj);
 
   useEffect(() => {
     getProjectBySlug(slug).then((res) => {

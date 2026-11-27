@@ -19,16 +19,21 @@ import {
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getProductBySlug, getProducts, getCategories } from "@/lib/firebase/firestore-service";
 import { Product, Category } from "@/lib/types";
+import { initialProducts, initialCategories } from "@/lib/initial-data";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const slug = params?.slug as string;
   const { language, localize } = useLanguage();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [category, setCategory] = useState<Category | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const seedProd = initialProducts.find((p) => p.slug === slug);
+  const seedCat = seedProd ? initialCategories.find((c) => c.id === seedProd.categoryId) : null;
+  const seedRelated = seedProd ? initialProducts.filter((p) => p.categoryId === seedProd.categoryId && p.id !== seedProd.id).slice(0, 3) : [];
+
+  const [product, setProduct] = useState<Product | null>(seedProd || null);
+  const [category, setCategory] = useState<Category | null>(seedCat || null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>(seedRelated);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!seedProd);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
