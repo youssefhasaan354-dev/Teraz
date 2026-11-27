@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="markGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D9B97E" />
+      <stop offset="50%" stop-color="#B38B54" />
+      <stop offset="100%" stop-color="#8F6D3C" />
+    </linearGradient>
+  </defs>
+
+  <!-- Circular subtle border -->
+  <circle cx="80" cy="80" r="76" fill="#F7F2EA" stroke="url(#markGoldGrad)" stroke-width="2" />
+
+  <g transform="translate(18, 5)">
+    <!-- Base Gold Ground Line -->
+    <line x1="12" y1="120" x2="112" y2="120" stroke="url(#markGoldGrad)" stroke-width="2.5" stroke-linecap="round" />
+    
+    <!-- Large Serif Capital 'T' in Espresso-Black -->
+    <path d="M 30,32 L 95,32 L 95,42 L 68,42 L 68,112 L 74,114 L 74,119 L 51,119 L 51,114 L 57,112 L 57,42 L 30,42 Z" fill="#1C1512" />
+    
+    <!-- Curved Brushed-Gold Swoosh Arc Crossing 'T' -->
+    <path d="M 16,80 Q 62,35 116,68 Q 80,88 24,104" fill="none" stroke="url(#markGoldGrad)" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Modern Armchair Icon -->
+    <g transform="translate(70, 84) scale(0.65)">
+      <path d="M 10,10 C 10,2 30,2 30,10 L 30,32 C 30,35 27,38 20,38 C 13,38 10,35 10,32 Z" fill="#1C1512" />
+      <path d="M 4,20 C 4,16 9,16 9,20 L 9,33 C 9,35 6,37 4,37 C 2,37 4,34 4,33 Z" fill="url(#markGoldGrad)" />
+      <path d="M 31,20 C 31,16 36,16 36,20 L 36,33 C 36,35 34,37 36,37 C 38,37 31,34 31,33 Z" fill="url(#markGoldGrad)" />
+      <line x1="8" y1="38" x2="4" y2="52" stroke="#1C1512" stroke-width="2" stroke-linecap="round" />
+      <line x1="32" y1="38" x2="36" y2="52" stroke="#1C1512" stroke-width="2" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>

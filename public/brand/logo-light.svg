@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2DEB9" />
+      <stop offset="50%" stop-color="#D9B97E" />
+      <stop offset="100%" stop-color="#B38B54" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left Icon Mark: Light Version -->
+  <g transform="translate(40, 20)">
+    <!-- Base Gold Ground Line -->
+    <line x1="10" y1="135" x2="120" y2="135" stroke="url(#goldGradLight)" stroke-width="2.5" stroke-linecap="round" />
+    
+    <!-- Large Serif Capital 'T' in Cream -->
+    <path d="M 30,35 L 100,35 L 100,45 L 72,45 L 72,125 L 78,127 L 78,133 L 52,133 L 52,127 L 58,125 L 58,45 L 30,45 Z" fill="#F7F2EA" />
+    
+    <!-- Curved Brushed-Gold Swoosh Arc Crossing 'T' -->
+    <path d="M 15,90 Q 65,40 125,75 Q 85,95 25,115" fill="none" stroke="url(#goldGradLight)" stroke-width="3.5" stroke-linecap="round" />
+
+    <!-- Minimal Modern Armchair Icon -->
+    <g transform="translate(75, 96) scale(0.7)">
+      <path d="M 10,10 C 10,2 30,2 30,10 L 30,32 C 30,35 27,38 20,38 C 13,38 10,35 10,32 Z" fill="#F7F2EA" />
+      <path d="M 4,20 C 4,16 9,16 9,20 L 9,33 C 9,35 6,37 4,37 C 2,37 4,34 4,33 Z" fill="url(#goldGradLight)" />
+      <path d="M 31,20 C 31,16 36,16 36,20 L 36,33 C 36,35 34,37 36,37 C 38,37 31,34 31,33 Z" fill="url(#goldGradLight)" />
+      <line x1="8" y1="38" x2="4" y2="52" stroke="#F7F2EA" stroke-width="2" stroke-linecap="round" />
+      <line x1="32" y1="38" x2="36" y2="52" stroke="#F7F2EA" stroke-width="2" stroke-linecap="round" />
+    </g>
+  </g>
+
+  <!-- Typography Block -->
+  <g transform="translate(190, 50)">
+    <text x="0" y="55" font-family="'Playfair Display', 'Cormorant Garamond', 'Georgia', serif" font-size="54" font-weight="700" letter-spacing="1.5" fill="#F7F2EA">
+      Teraz
+    </text>
+
+    <text x="180" y="55" font-family="'Cairo', 'Amiri', 'Traditional Arabic', sans-serif" font-size="46" font-weight="700" fill="#D9B97E">
+      طِـــرَاز
+    </text>
+
+    <g transform="translate(0, 75)">
+      <line x1="0" y1="-5" x2="55" y2="-5" stroke="url(#goldGradLight)" stroke-width="1.5" />
+      <text x="70" y="0" font-family="'Inter', 'Montserrat', sans-serif" font-size="13" font-weight="600" letter-spacing="8" fill="#EDE3D3">
+        FURNITURE &amp; KITCHENS
+      </text>
+      <line x1="285" y1="-5" x2="340" y2="-5" stroke="url(#goldGradLight)" stroke-width="1.5" />
+    </g>
+
+    <g transform="translate(0, 98)">
+      <text x="2" y="0" font-family="'Inter', 'Montserrat', sans-serif" font-size="10.5" font-weight="400" letter-spacing="5" fill="#D9B97E">
+        LIVE IN ELEGANCE
+      </text>
+      <circle cx="165" cy="-3.5" r="2" fill="#D9B97E" />
+      <text x="180" y="0" font-family="'Cairo', sans-serif" font-size="11.5" font-weight="600" letter-spacing="2" fill="#D9B97E">
+        عِــــش الأنَـــاقَــــة
+      </text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,105 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated admin/staff
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isSuperAdmin() {
+      return isAuthenticated() && (request.auth.token.role == 'super_admin' || request.auth.token.email == 'terazfurneture@gmail.com');
+    }
+    
+    function isStaff() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'super_admin' || 
+        request.auth.token.role == 'editor' || 
+        request.auth.token.role == 'sales' ||
+        request.auth.token.email == 'terazfurneture@gmail.com'
+      );
+    }
+
+    // Public readable content collections
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /products/{productId} {
+      allow read: if resource == null || resource.data.status == 'published' || isStaff();
+      allow write: if isStaff();
+    }
+
+    match /projects/{projectId} {
+      allow read: if resource == null || resource.data.status == 'published' || isStaff();
+      allow write: if isStaff();
+    }
+
+    match /pages/{pageId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /materials/{materialId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /configurator/{category}/items/{itemId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /testimonials/{id} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /faqs/{id} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /services/{id} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /stats/{id} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /media/{mediaId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // Leads & Inquiries: Public can create, only staff can read and modify
+    match /leads/{leadId} {
+      allow create: if request.resource.data.fullName is string
+                    && request.resource.data.fullName.size() > 0
+                    && request.resource.data.phone is string
+                    && request.resource.data.phone.size() >= 8
+                    && request.resource.data.serviceType is string;
+      allow read, update, delete: if isStaff();
+    }
+
+    // User collection
+    match /users/{userId} {
+      allow read: if isStaff();
+      allow write: if isSuperAdmin();
+    }
+
+    // Audit logs
+    match /auditLogs/{logId} {
+      allow read, write: if isStaff();
+    }
+  }
+}
