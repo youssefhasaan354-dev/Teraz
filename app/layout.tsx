@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://teraaz-webb.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
   title: "طِراز للأثاث والمطابخ (TERAZ) — Live in Elegance",
   description: "تصميم وتنفيذ أفخم المطابخ الخشبية والألوميتال، الكلادينج المعماري، والموبيليا الفاخرة للأفراد والشركات في مصر. اطلب استشارة وعرض سعر مجاني.",
   keywords: [
@@ -25,11 +27,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "طِراز للأثاث والمطابخ (TERAZ) — Live in Elegance",
     description: "تصميم وتنفيذ أفخم المطابخ الخشبية والألوميتال، الكلادينج المعماري، والموبيليا الفاخرة للأفراد والشركات في مصر.",
-    url: "https://teraz-furniture.com",
+    url: siteUrl,
     siteName: "TERAZ Furniture",
     images: [
       {
-        url: "/brand/logo-full.svg",
+        url: `${siteUrl}/brand/logo-full.svg`,
         width: 1200,
         height: 630,
         alt: "TERAZ Furniture & Kitchens Logo",
@@ -37,6 +39,12 @@ export const metadata: Metadata = {
     ],
     locale: "ar_EG",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "طِراز للأثاث والمطابخ (TERAZ) — Live in Elegance",
+    description: "تصميم وتنفيذ أفخم المطابخ الخشبية والألوميتال، الكلادينج المعماري، والموبيليا الفاخرة للأفراد والشركات في مصر.",
+    images: [`${siteUrl}/brand/logo-full.svg`],
   },
 };
 

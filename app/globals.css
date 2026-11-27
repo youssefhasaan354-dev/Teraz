@@ -172,3 +172,25 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Accessibility: Complete Motion Disabling for prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-marquee,
+  .animate-marquee-reverse,
+  .pulse-gold {
+    animation: none !important;
+    transform: none !important;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+}
+

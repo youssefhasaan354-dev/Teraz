@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Phone, Mail, Clock, MapPin, Instagram, Facebook, ArrowUpRight, ShieldCheck, Lock } from "lucide-react";
+import { Phone, Mail, Clock, MapPin, Instagram, Facebook, ArrowUpRight, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getSiteSettings, getCategories } from "@/lib/firebase/firestore-service";
 import { SiteSettings, Category } from "@/lib/types";
@@ -189,7 +189,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright & Admin CMS Link */}
+        {/* Bottom Bar: Copyright & Policy Links */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-cream/50">
           <p>
             {language === "ar"
@@ -203,13 +203,6 @@ export function Footer() {
             </Link>
             <Link href="/terms" className="hover:text-cream transition-colors">
               {language === "ar" ? "الشروط والأحكام" : "Terms & Conditions"}
-            </Link>
-            <Link
-              href="/admin"
-              className="flex items-center gap-1 text-gold-light/70 hover:text-gold-light transition-colors border border-gold/20 px-2.5 py-1 rounded-full"
-            >
-              <Lock className="w-3 h-3" />
-              <span>{language === "ar" ? "لوحة الإدارة (CMS)" : "Admin Portal"}</span>
             </Link>
           </div>
         </div>

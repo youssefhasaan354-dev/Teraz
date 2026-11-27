@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 interface SplitTextProps {
   text: string;
   className?: string;
   delay?: number;
   wordSpacing?: string;
+  priority?: boolean;
 }
 
 export function SplitText({
@@ -15,25 +16,33 @@ export function SplitText({
   className = "",
   delay = 0,
   wordSpacing = "mx-1.5",
+  priority = false,
 }: SplitTextProps) {
+  const shouldReduceMotion = useReducedMotion();
+
+  // If priority (above the fold) or reduced motion, render text immediately without delay
+  if (shouldReduceMotion || priority) {
+    return <span className={className}>{text}</span>;
+  }
+
   const words = text.split(" ");
 
   const container = {
     hidden: { opacity: 0 },
     visible: (i = 1) => ({
       opacity: 1,
-      transition: { staggerChildren: 0.08, delayChildren: delay * i },
+      transition: { staggerChildren: 0.06, delayChildren: delay * i },
     }),
   };
 
   const child = {
     hidden: {
       opacity: 0,
-      y: 25,
+      y: 18,
       transition: {
         type: "spring",
-        damping: 14,
-        stiffness: 100,
+        damping: 15,
+        stiffness: 110,
       },
     },
     visible: {
@@ -41,26 +50,29 @@ export function SplitText({
       y: 0,
       transition: {
         type: "spring",
-        damping: 14,
-        stiffness: 100,
+        damping: 15,
+        stiffness: 110,
       },
     },
   };
 
   return (
     <motion.span
-      className={`inline-flex flex-wrap ${className}`}
+      className={`inline-block overflow-hidden ${className}`}
       variants={container}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
     >
       {words.map((word, index) => (
-        <span key={index} className={`inline-block overflow-hidden ${wordSpacing}`}>
-          <motion.span variants={child} className="inline-block">
-            {word}
-          </motion.span>
-        </span>
+        <motion.span
+          variants={child}
+          key={index}
+          className={`inline-block ${wordSpacing}`}
+          style={{ willChange: "transform, opacity" }}
+        >
+          {word}
+        </motion.span>
       ))}
     </motion.span>
   );

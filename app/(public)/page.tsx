@@ -43,7 +43,7 @@ import {
   StatItem,
   ServiceItem,
 } from "@/lib/types";
-import { Reveal } from "@/components/motion/Reveal";
+import { Reveal, RevealStagger } from "@/components/motion/Reveal";
 import { SplitText } from "@/components/motion/SplitText";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { Counter } from "@/components/motion/Counter";
@@ -114,8 +114,8 @@ export default function HomePage() {
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          {/* Eyebrow Pill */}
-          <Reveal direction="down" delay={0.1}>
+          {/* Eyebrow Pill: Priority for LCP */}
+          <Reveal variant="down" priority={true}>
             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gold/15 text-gold-light border border-gold/40 backdrop-blur-md shadow-lg">
               <Sparkles className="w-4 h-4 text-gold animate-spin-slow" />
               <span className="text-xs font-bold tracking-widest uppercase">
@@ -124,10 +124,11 @@ export default function HomePage() {
             </div>
           </Reveal>
 
-          {/* Headline with High-Contrast Typography */}
+          {/* Headline with High-Contrast Typography: Priority for LCP */}
           <div className="space-y-2">
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-cream leading-[1.15]">
               <SplitText
+                priority={true}
                 text={language === "ar" ? "حيث يلتقي الإبداع" : "Where Artistry Meets"}
                 className="block text-cream"
               />
@@ -138,7 +139,7 @@ export default function HomePage() {
           </div>
 
           {/* Subtitle */}
-          <Reveal delay={0.3}>
+          <Reveal variant="up" delay={0.15}>
             <p className="max-w-2xl mx-auto text-base sm:text-lg text-cream/80 font-normal leading-relaxed">
               {language === "ar"
                 ? "نبتكر لك مطابخ عصرية، تجاليد كلادينج فاخرة، وقطع موبيليا تُصنع خصيصًا لتعكس ذوقك الرفيع بجودة متوارثة تدوم لأجيال."
@@ -147,7 +148,7 @@ export default function HomePage() {
           </Reveal>
 
           {/* Magnetic CTA Buttons */}
-          <Reveal delay={0.4}>
+          <Reveal variant="up" delay={0.25}>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
               <Magnetic strength={0.25}>
                 <Link
@@ -172,7 +173,7 @@ export default function HomePage() {
           </Reveal>
 
           {/* Trust Badges */}
-          <Reveal delay={0.5}>
+          <Reveal variant="fade" delay={0.35}>
             <div className="pt-8 flex flex-wrap justify-center items-center gap-6 sm:gap-10 text-xs text-cream/70 border-t border-gold/20 max-w-2xl mx-auto">
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-gold" />
@@ -201,7 +202,7 @@ export default function HomePage() {
       {/* ============================================================ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-6 space-y-6">
+          <Reveal variant="up" className="lg:col-span-6 space-y-6">
             <span className="text-xs font-bold text-gold uppercase tracking-widest block">
               {language === "ar" ? "فلسفة طِراز (TERAZ)" : "The TERAZ Philosophy"}
             </span>
@@ -221,29 +222,33 @@ export default function HomePage() {
             </p>
 
             <div className="grid grid-cols-2 gap-4 pt-2">
-              <div className="p-4 rounded-2xl bg-cream-dark/60 border border-gold/20">
-                <span className="text-2xl font-bold text-gold block">100%</span>
-                <span className="text-xs text-espresso font-semibold block mt-1">
-                  {language === "ar" ? "مقاومة للمياه والرطوبة" : "Moisture & Water Proof"}
-                </span>
-                <span className="text-[11px] text-taupe block mt-0.5">
-                  {language === "ar" ? "شاسيهات معالجة للبيئة المصرية" : "Engineered for climate resilience"}
-                </span>
-              </div>
+              <Reveal variant="up" staggerIndex={0}>
+                <div className="p-4 rounded-2xl bg-cream-dark/60 border border-gold/20">
+                  <span className="text-2xl font-bold text-gold block">100%</span>
+                  <span className="text-xs text-espresso font-semibold block mt-1">
+                    {language === "ar" ? "مقاومة للمياه والرطوبة" : "Moisture & Water Proof"}
+                  </span>
+                  <span className="text-[11px] text-taupe block mt-0.5">
+                    {language === "ar" ? "شاسيهات معالجة للبيئة المصرية" : "Engineered for climate resilience"}
+                  </span>
+                </div>
+              </Reveal>
 
-              <div className="p-4 rounded-2xl bg-cream-dark/60 border border-gold/20">
-                <span className="text-2xl font-bold text-gold block">Blum</span>
-                <span className="text-xs text-espresso font-semibold block mt-1">
-                  {language === "ar" ? "مفصلات نمساوية أصلية" : "Austrian Soft-Close"}
-                </span>
-                <span className="text-[11px] text-taupe block mt-0.5">
-                  {language === "ar" ? "سلاسة إغلاق مدى الحياة" : "Lifetime smooth closure"}
-                </span>
-              </div>
+              <Reveal variant="up" staggerIndex={1}>
+                <div className="p-4 rounded-2xl bg-cream-dark/60 border border-gold/20">
+                  <span className="text-2xl font-bold text-gold block">Blum</span>
+                  <span className="text-xs text-espresso font-semibold block mt-1">
+                    {language === "ar" ? "مفصلات نمساوية أصلية" : "Austrian Soft-Close"}
+                  </span>
+                  <span className="text-[11px] text-taupe block mt-0.5">
+                    {language === "ar" ? "سلاسة إغلاق مدى الحياة" : "Lifetime smooth closure"}
+                  </span>
+                </div>
+              </Reveal>
             </div>
-          </div>
+          </Reveal>
 
-          <div className="lg:col-span-6 relative aspect-[4/3] rounded-3xl overflow-hidden border border-gold/30 shadow-2xl">
+          <Reveal variant="clip" className="lg:col-span-6 relative aspect-[4/3] rounded-3xl overflow-hidden border border-gold/30 shadow-2xl">
             <Image
               src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80"
               alt="TERAZ Bespoke Interior Craft"
@@ -257,7 +262,7 @@ export default function HomePage() {
               </span>
               <span className="text-gold font-bold">TERAZ Craftsmanship</span>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -293,15 +298,17 @@ export default function HomePage() {
           </p>
         </div>
 
-        <BeforeAfter
-          beforeImage="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80"
-          afterImage="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"
-          caption={
-            language === "ar"
-              ? "مشروع فيلا التجمع الخامس — تجديد شامل للمطبخ وتجاليد الجدران"
-              : "New Cairo Villa Project — Comprehensive Kitchen & Wall Cladding Renovation"
-          }
-        />
+        <Reveal variant="clip">
+          <BeforeAfter
+            beforeImage="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80"
+            afterImage="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"
+            caption={
+              language === "ar"
+                ? "مشروع فيلا التجمع الخامس — تجديد شامل للمطبخ وتجاليد الجدران"
+                : "New Cairo Villa Project — Comprehensive Kitchen & Wall Cladding Renovation"
+            }
+          />
+        </Reveal>
       </section>
 
       {/* ============================================================ */}
@@ -343,7 +350,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <RevealStagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
             {
               step: "01",
@@ -402,8 +409,10 @@ export default function HomePage() {
           ].map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div
+              <Reveal
                 key={idx}
+                staggerIndex={idx}
+                variant="up"
                 className="p-6 rounded-2xl bg-cream-dark/50 border border-gold/25 hover:border-gold transition-all duration-300 relative group flex flex-col justify-between"
               >
                 <div className="space-y-4">
@@ -418,10 +427,10 @@ export default function HomePage() {
                   <h3 className="text-base font-bold text-espresso">{localize(item.title)}</h3>
                   <p className="text-xs text-taupe leading-relaxed">{localize(item.desc)}</p>
                 </div>
-              </div>
+              </Reveal>
             );
           })}
-        </div>
+        </RevealStagger>
       </section>
 
       {/* ============================================================ */}
@@ -460,10 +469,12 @@ export default function HomePage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {testimonials.map((t) => (
-            <div
+        <RevealStagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {testimonials.map((t, idx) => (
+            <Reveal
               key={t.id}
+              staggerIndex={idx}
+              variant="up"
               className="p-6 rounded-2xl bg-cream-dark/60 border border-gold/25 hover:border-gold transition-all duration-300 flex flex-col justify-between space-y-4"
             >
               <div className="space-y-3">
@@ -479,9 +490,9 @@ export default function HomePage() {
                 <h4 className="text-xs font-bold text-espresso">{localize(t.name)}</h4>
                 <span className="text-[11px] text-taupe block">{localize(t.roleLocation)}</span>
               </div>
-            </div>
+            </Reveal>
           ))}
-        </div>
+        </RevealStagger>
       </section>
 
       {/* ============================================================ */}
@@ -497,12 +508,14 @@ export default function HomePage() {
           </h2>
         </div>
 
-        <div className="space-y-3">
-          {faqs.map((faq) => {
+        <RevealStagger className="space-y-3">
+          {faqs.map((faq, idx) => {
             const isOpen = openFaq === faq.id;
             return (
-              <div
+              <Reveal
                 key={faq.id}
+                staggerIndex={idx}
+                variant="up"
                 className="rounded-2xl border border-gold/25 bg-cream-dark/50 overflow-hidden transition-colors"
               >
                 <button
@@ -521,17 +534,20 @@ export default function HomePage() {
                     {localize(faq.answer)}
                   </div>
                 )}
-              </div>
+              </Reveal>
             );
           })}
-        </div>
+        </RevealStagger>
       </section>
 
       {/* ============================================================ */}
       {/* 12. FINAL CTA BANNER                                         */}
       {/* ============================================================ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        <div className="relative rounded-3xl overflow-hidden bg-espresso text-cream p-8 sm:p-14 lg:p-16 border border-gold/40 shadow-2xl text-center space-y-6">
+        <Reveal
+          variant="clip"
+          className="relative rounded-3xl overflow-hidden bg-espresso text-cream p-8 sm:p-14 lg:p-16 border border-gold/40 shadow-2xl text-center space-y-6"
+        >
           <div className="absolute inset-0 z-0">
             <Image
               src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=80"
@@ -579,7 +595,7 @@ export default function HomePage() {
               </a>
             </div>
           </div>
-        </div>
+        </Reveal>
       </section>
     </div>
   );
